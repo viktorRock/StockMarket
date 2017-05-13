@@ -2,6 +2,7 @@
   "name": "stockdashboard",
   "version": "1.0.0",
   "description": "stock market dashboard",
+  "main": "\\public\\scripts\\index.js",
   "dependencies": {
     "angular-chart.js": "^1.1.1",
     "chart": "^0.1.2",

@@ -1,0 +1,28 @@
+{
+  "name": "stockdashboard",
+  "version": "1.0.0",
+  "description": "stock market dashboard",
+  "main": "C:\\Users\\Paulo Victor\\Documents\\Firebase\\StockMarket\\public\\scripts\\index.js",
+  "dependencies": {
+    "angular-chart.js": "^1.1.1",
+    "chart": "^0.1.2",
+    "chartjs": "^0.3.24",
+    "ejs": "^2.5.6",
+    "express": "^4.15.2",
+    "gentelella": "^1.3.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/viktorRock/stockMarketSharesScrapers.git"
+  },
+  "author": "Paulo Victor Mathias Silva",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/viktorRock/stockMarketSharesScrapers/issues"
+  },
+  "homepage": "https://github.com/viktorRock/stockMarketSharesScrapers#readme"
+}

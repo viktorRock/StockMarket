@@ -1,4 +1,4 @@
-var apiURL = "https://storage.scrapinghub.com/items/158119/1/118?apikey=a1690d124fb0421eb1cdba5a979fd9fc&format=json";
+var shubAPIURL = "https://storage.scrapinghub.com/items/158119/1/118?apikey=a1690d124fb0421eb1cdba5a979fd9fc&format=json";
 
 
 // Load the Visualization API and the controls package.
@@ -12,7 +12,7 @@ function drawChart() {
 	// Create a dashboard.
 	var dashboard = new google.visualization.Dashboard(document.getElementById('dashboard_div'));
 	var wrap = new google.visualization.ChartWrapper();	
-	var dataTable =  getStocksDataTable();
+	var dataTable =  requestStockPrices();
 
 	//Wrapper
 	var wrap = new google.visualization.ChartWrapper({
@@ -53,9 +53,9 @@ function redrawChart(){
 }
 
 
-function getStocksDataTable(){
+function getStocksDataTable(in_jsonData){
 
-	var jsonArray  = JSON.parse(requestStockPrices());
+	var jsonArray  = JSON.parse(in_jsonData);
 	var dataTable = new google.visualization.DataTable({
 		cols: [
 			// {id: '_type', label: '_type', type: 'string'},
@@ -100,14 +100,15 @@ function formatInputArray(inputArray){
 }
 
 function requestStockPrices(){
+	var stocks;
 
 	var jsonData = $.ajax({
-		url: apiURL,
+		url: shubAPIURL,
 		dataType: "json",
 		async: false
 	}).responseText;
 
-	return jsonData;
+	return getStocksDataTable(jsonData);
 }
 
 

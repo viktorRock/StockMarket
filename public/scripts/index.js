@@ -2,36 +2,39 @@ var shubAPIURL = "https://storage.scrapinghub.com/items/158119/1/118?apikey=a169
 
 
 // Load the Visualization API and the controls package.
-google.charts.load('current', {'packages':['corechart', 'controls', 'charteditor']})
+google.charts.load('current', {'packages':['table','charteditor'],'language': 'pt'})
+//google.charts.load('current', {'packages':['corechart', 'controls', 'charteditor']})
 
 // Set a callback to run when the Google Visualization API is loaded.
 google.charts.setOnLoadCallback(drawChart);
 
+var chartEditor = null;
+var chartEditorDiv = null;
+var chartWrapper = null; 
 function drawChart() {
 
 	// Create a dashboard.
 	var dashboard = new google.visualization.Dashboard(document.getElementById('dashboard_div'));
-	var wrap = new google.visualization.ChartWrapper();	
 	var dataTable =  requestStockPrices();
+	chartEditorDiv = document.getElementById('chartDraw');
 
 	//Wrapper
-	var wrap = new google.visualization.ChartWrapper({
+	chartWrapper = new google.visualization.ChartWrapper({
 		'chartType':'Table',
-		'containerId':'chartDraw',
+		'containerId':'stocksTable',
 	});
 
 	var options = {
 		title: 'Wallet',
-		// curveType: 'function',
 		legend: { position: 'center' },
 		is3D: true
 	};
-	wrap.setDataTable(dataTable);
-	wrap.setOptions(options);
+	chartWrapper.setDataTable(dataTable);
+	chartWrapper.setOptions(options);
 	//wrap.draw();
 
 	// Range slider, passing some options
-	var rangeSlider = new google.visualization.ControlWrapper({
+	var categoryFilter = new google.visualization.ControlWrapper({
 		'controlType': 'CategoryFilter', //NumberRangeFilter
 		'containerId': 'filter_div',
 		'options': {
@@ -39,19 +42,24 @@ function drawChart() {
 		}
 	});
 
-	dashboard.bind(rangeSlider, wrap);
-	dashboard.draw(dataTable);
-
 	chartEditor = new google.visualization.ChartEditor();
 	google.visualization.events.addListener(chartEditor, 'ok', redrawChart);
-	chartEditor.openDialog(wrap, {});
+
+	chartWrapper.draw();
+	// dashboard.bind(categoryFilter, chartWrapper);
+	dashboard.bind(categoryFilter, chartWrapper);
+	dashboard.draw(dataTable);
+
 }
 
 // On "OK" save the chart to a <div> on the page.
 function redrawChart(){
-	chartEditor.getChartWrapper().draw(document.getElementById('chartDraw'));
+	chartEditor.getChartWrapper().draw(chartEditorDiv);
 }
 
+function loadEditor(){
+	chartEditor.openDialog(chartWrapper, {});
+}
 
 function getStocksDataTable(in_jsonData){
 
@@ -59,7 +67,7 @@ function getStocksDataTable(in_jsonData){
 	var dataTable = new google.visualization.DataTable({
 		cols: [
 			// {id: '_type', label: '_type', type: 'string'},
-			{id: 'dataHora', label: 'Data/Hora', type: 'string'},
+			{id: 'dataHora', label: 'Data/Hora', type: 'date'},
 			{id: 'cotacao', label: 'Cotação', type: 'number'},
 			{id: 'volume', label: 'Volume', type: 'number'},
 			{id: 'minima', label: 'Mínima', type: 'number'},
@@ -83,8 +91,10 @@ function formatInputArray(inputArray){
 	inputArray.forEach( function (stockPrice)
 	{
 		if(stockPrice.alerta == null){
+			var strDate = stockPrice["Data/Hora"].split("/");
+			var currDate = new Date(strDate[2],strDate[1] -1 ,strDate[0])
 			data.push([
-				(stockPrice["Data/Hora"]),
+				currDate,
 				Number(stockPrice["Cotação"].replace(".","").replace(",",".")),
 				Number(stockPrice["Volume"].replace(".","").replace(",",".")),
 				Number(stockPrice["Mínima"].replace(".","").replace(",",".")),
@@ -110,7 +120,6 @@ function requestStockPrices(){
 
 	return getStocksDataTable(jsonData);
 }
-
 
 function handleQueryResponse(response) {
 	if (response.isError()) {

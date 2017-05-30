@@ -46,6 +46,11 @@ body {
   background: #ececec;
 }
 
+.google-visualization-table-td.google-visualization-table-type-number {
+    text-align: center;
+    white-space: nowrap;
+}
+
 .header {
   width: 100%;
   height: 56px;

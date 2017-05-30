@@ -7,7 +7,7 @@
   <meta name="EasyStock" content="Dashboard for Stock Market">
   <title>EasyStock</title>
   
-  <link rel="stylesheet" type="text/css" href="styles/index.css">
+  
 
   <!-- Apple custom part -->
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -23,7 +23,6 @@
 
   <!-- manifest and meta theme color -->
   <link rel="manifest" href="manifest.json">
-  <link href="../node_modules/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"> </script>
 
   <title>EasyStock</title>
@@ -35,15 +34,25 @@
   <div id="message">
     <h1>EasyStock Dashboards</h1>
   </div>
- 
+
   <div id="charts_area">
-    <h1>Sample Application</h1>
-    <input type="submit" name="loadcharteditor" id="loadcharteditor" value="Edit me!" onclick="loadEditor()" style="font-size:18px;">
-    <!--Divs that will hold each control and chart-->
-    <div id="dashboard_div"></div>
-    <div id="filter_div"></div>
-    <div id="chartDraw"></div>
-    <div id="stocksTable" style="height: 400px; width: 600px;"></div>
+    <div action="" id="dashboard_div">
+      <h1>Sample Application</h1>
+      <input type="submit" name="loadcharteditor" id="loadcharteditor" value="Edit me!" onclick="loadEditor()" style="font-size:18px;">
+
+      <div action="" id="filter_div"></div>
+      <form action="">
+        Number of rows to show:
+        <select id="pageSize-select">
+          <option value="5">5</option>
+          <option value="8">8</option>
+          <option selected=selected value="10">10</option>
+          <option value="-1">-1</option>
+        </select>
+      </form>
+      <div id="stocksTable"></div>
+    </div>
+    <div id="chartEditor_div"></div>
   </div>
 </div>
 
@@ -52,6 +61,7 @@
 <!-- <script type="text/javascript" src="https://www.google.com/jsapi"></script> -->
 <script src="scripts/localforage-1.5.0.js"></script>
 <script src="scripts/index.js"></script>
+<link rel="stylesheet" type="text/css" href="styles/index.css">
 
 </body>
 </html>

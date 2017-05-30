@@ -37,11 +37,7 @@ function drawChart() {
 		allowHtml: "true",
 		pageSize: 10,
 		sortColumn: 0,
-		sortAscending: false,
-		series: {
-			1:{color: 'black', visibleInLegend: false},
-			2:{color: 'black', visibleInLegend: true},		
-		}
+		sortAscending: false
 
 	};
 	chartWrapper.setOptions(options);

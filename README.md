@@ -1,7 +1,7 @@
 # StockMarket
 StocksMarketApp
 
-Is the prototype of a PWA to help users, to track stock market shares and to calculate over time the profitability and sugestions about the efficiency of the wallet.
+It's the prototype of a PWA to help users, to track stock market shares and to calculate over time the profitability and sugestions about the efficiency of the wallet.
 
 TO DO list
 - Design

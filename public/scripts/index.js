@@ -22,9 +22,15 @@ function drawChart() {
 	// dataTable.sort([{'column': 0}]);
 	chartEditorElement = document.getElementById('chartEditor_div');
 
+	var result = google.visualization.data.group(
+		dataTable,
+		[0],
+		[{'column': 2, 'aggregation': google.visualization.data.sum, 'type': 'number'}]
+		);
+
 	// Create a view
 	var dataView = new google.visualization.DataView(dataTable);
-	dataView.setColumns([0, 4]);
+	dataView.setColumns([0, 2]);
 
 	//Wrapper
 	chartWrapper = new google.visualization.ChartWrapper({
@@ -39,7 +45,7 @@ function drawChart() {
 		// is3D: true,
 		allowHtml: "true",
 		pageSize: 10,
-		sortColumn: 0,
+		sortColumn: 1,
 		sortAscending: false
 	};
 	chartWrapper.setOptions(options);
@@ -56,28 +62,20 @@ function drawChart() {
 	dashboard.bind(categoryFilter, chartWrapper);
 	dashboard.draw(dataTable);
 
-	var lineChart = new google.visualization.LineChart(chartEditorElement);
-
-	var lineoptions = {
-		title: 'Wallet',
+	var lineOptions = {
+		title: 'MyWallet',
 		legend: { position: 'center' },
-		// is3D: true,
+		is3D: true,
 		allowHtml: "true",
-		 // Allow multiple
-		 // simultaneous selections.
-		selectionMode: 'multiple',
-		 // Trigger tooltips
-		 // on selections.
-		tooltip: {trigger: 'selection'},
-		 // Group selections
-		 // by x-value.
-		aggregationTarget: 'category'
 	};
-	lineChart.draw(dataView,lineoptions);
+	var lineChart = new google.visualization.LineChart(chartEditorElement);
+		// lineChart.draw(dataView,lineOptions);
 
+		var piChart = new google.visualization.PieChart(document.getElementById('pieChart_div'));
+		piChart.draw(result, lineOptions);
 
-	// chartEditor = new google.visualization.ChartEditor();
-	// google.visualization.events.addListener(chartEditor, 'ok', redrawChart);
+		chartEditor = new google.visualization.ChartEditor();
+		google.visualization.events.addListener(chartEditor, 'ok', redrawChart);
 	// chartEditor.openDialog(chartWrapper, {});	
 }
 
@@ -98,28 +96,29 @@ function loadEditor(){
 
 function getStocksDataTable(){
 	var jsonResponse = requestStockPrices();
+	var dataTableArr = null;
 
 	if (jsonResponse == null){
 		jsonResponse = '[{"_type":"dict","Data/Hora":"31/05/2017","Cotação":"27,17","Volume":"9.430.500","Mínima":"26,87","Variação (%)":"-5,00","Máxima":"28,27","Variação":"-1,43","stock":"[\'VALE3.SA\']"},{"_type":"dict","Data/Hora":"30/05/2017","Cotação":"28,60","Volume":"3.071.000","Mínima":"27,92","Variação (%)":"1,92","Máxima":"28,90","Variação":"0,54","stock":"[\'VALE3.SA\']"},{"_type":"dict","Data/Hora":"29/05/2017","Cotação":"28,06","Volume":"2.945.800","Mínima":"27,58","Variação (%)":"0,72","Máxima":"28,75","Variação":"0,20","stock":"[\'VALE3.SA\']"},{"_type":"dict","Data/Hora":"26/05/2017","Cotação":"27,86","Volume":"2.956.900","Mínima":"27,33","Variação (%)":"0,58","Máxima":"27,92","Variação":"0,16","stock":"[\'VALE3.SA\']"},{"_type":"dict","Data/Hora":"25/05/2017","Cotação":"27,70","Volume":"3.993.000","Mínima":"27,15","Variação (%)":"0,65","Máxima":"27,94","Variação":"0,18","stock":"[\'VALE3.SA\']"},{"_type":"dict","Data/Hora":"24/05/2017","Cotação":"27,52","Volume":"4.307.700","Mínima":"27,27","Variação (%)":"-2,62","Máxima":"28,13","Variação":"-0,74","stock":"[\'VALE3.SA\']"},{"_type":"dict","Data/Hora":"23/05/2017","Cotação":"28,26","Volume":"5.402.600","Mínima":"27,16","Variação (%)":"1,22","Máxima":"28,36","Variação":"0,34","stock":"[\'VALE3.SA\']"},{"_type":"dict","Data/Hora":"22/05/2017","Cotação":"27,92","Volume":"7.974.200","Mínima":"26,92","Variação (%)":"2,46","Máxima":"28,17","Variação":"0,67","stock":"[\'VALE3.SA\']"},{"_type":"dict","Data/Hora":"19/05/2017","Cotação":"27,25","Volume":"6.487.500","Mínima":"27,00","Variação (%)":"1,45","Máxima":"27,97","Variação":"0,39","stock":"[\'VALE3.SA\']"}]';
 	}
 
 	var jsonArray  = JSON.parse(jsonResponse);
-	pricesArray = formatInputArray(jsonArray);
+	dataTableArr = formatInputArray(jsonArray);
 
 	var dataTable = new google.visualization.DataTable({
 		cols: [
+		{id: 'stock', label: 'stock', type: 'string'},
 		{id: 'dataHora', label: 'Data/Hora', type: 'date'},
 		{id: 'cotacao', label: 'Cotação', type: 'number'},
 		{id: 'volume', label: 'Volume', type: 'number'},
 		{id: 'minima', label: 'Mínima', type: 'number'},
 		{id: 'variacaoPCT', label: 'Variação (%)', type: 'number'},
 		{id: 'maxima', label: 'Máxima', type: 'number'},
-		{id: 'variacao', label: 'Variação', type: 'number'},
-		{id: 'stock', label: 'stock', type: 'string'}
+		{id: 'variacao', label: 'Variação', type: 'number'}
 		],rows: []
 	},'current');
 
-	dataTable.addRows(pricesArray);
+	dataTable.addRows(dataTableArr);
 
 	return dataTable;
 }
@@ -128,13 +127,15 @@ function formatResponseData(inputArray){
 
 	var data = new Array();
 	var auxArray = new Array();
+	var currPos = 1;
 	inputArray.forEach( function (stockPrice)
 	{
 
 		if(stockPrice.alerta == null){
 			
 			if(stocksArray[stockPrice["stock"]] == null){
-				stocksArray[stockPrice["stock"]] = stock.length;
+				stocksArray[stockPrice["stock"]] = stocksArray.length + 1;
+				currPos = stocksArray.length;
 			}
 
 			var strDate = stockPrice["Data/Hora"].split("/");
@@ -169,14 +170,14 @@ function formatInputArray(inputArray){
 			var strDate = stockPrice["Data/Hora"].split("/");
 			var currDate = new Date(strDate[2],strDate[1] -1 ,strDate[0])
 			data.push([
+				stockPrice["stock"].replace("[","").replace("]","").replace("'","").replace("'",""),
 				currDate,
 				Number(stockPrice["Cotação"].replace(".","").replace(",",".")),
 				Number(stockPrice["Volume"].replace(".","").replace(",",".")),
 				Number(stockPrice["Mínima"].replace(".","").replace(",",".")),
 				Number(stockPrice["Variação (%)"].replace(".","").replace(",",".")),
 				Number(stockPrice["Máxima"].replace(".","").replace(",",".")),
-				Number(stockPrice["Variação"].replace(".","").replace(",",".")),
-				stockPrice["stock"].replace("[","").replace("]","").replace("'","").replace("'","")
+				Number(stockPrice["Variação"].replace(".","").replace(",","."))
 				]);
 		}
 	});
